@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 25, 2025 at 02:46 PM
+-- Generation Time: Oct 07, 2025 at 09:46 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -1302,8 +1302,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `middle_name`, `last_name`, `gender`, `birth_date`, `email`, `email_verified_at`, `phone`, `address_1`, `address_2`, `user_image`, `password`, `roles_name`, `status`, `system_user`, `system_not_user`, `remember_token`, `created_at`, `updated_at`, `last_active_at`, `branch_id`, `department_id`, `job_id`, `sequential_code_id`, `number`, `full_code`) VALUES
-(1, 'Super', 'Super', 'Admin', 'male', '1986-10-01', 'superadmin@app.com', NULL, '01090411577', 'company address', 'company address', 'default.png', '$2y$10$9xbSQrGYlpMj9Ml6H.qs3ebrHTTV64t2p46e5TbPgUUF2dtZfp5MK', '[\"superadmin\"]', 1, 1, 0, NULL, '2025-09-18 08:18:54', '2025-09-19 03:06:32', '2025-09-19 03:06:32', 1, 1, 1, 2, 1, 'USER-00001'),
-(2, 'Admin', 'Admin', 'Admin', 'male', '1986-10-01', 'admin@app.com', NULL, '01090411575', 'company address', 'company address', 'default.png', '$2y$10$a3XDFRcHcqwzDmgEpcpEd./JdEZMfPO4OHEox55C2GvPunVXSRlH6', '[\"admin\"]', 1, 1, 0, NULL, '2025-09-18 08:18:54', '2025-09-25 07:15:49', '2025-09-25 07:15:49', 1, 1, 2, 2, 2, 'USER-00002'),
+(1, 'Super', 'Super', 'Admin', 'male', '1986-10-01', 'superadmin@app.com', NULL, '01090411577', 'company address', 'company address', 'default.png', '$2y$10$9xbSQrGYlpMj9Ml6H.qs3ebrHTTV64t2p46e5TbPgUUF2dtZfp5MK', '[\"superadmin\"]', 1, 1, 0, NULL, '2025-09-18 08:18:54', '2025-10-03 08:55:59', '2025-10-03 08:55:59', 1, 1, 1, 2, 1, 'USER-00001'),
+(2, 'Admin', 'Admin', 'Admin', 'male', '1986-10-01', 'admin@app.com', NULL, '01090411575', 'company address', 'company address', 'default.png', '$2y$10$a3XDFRcHcqwzDmgEpcpEd./JdEZMfPO4OHEox55C2GvPunVXSRlH6', '[\"admin\"]', 1, 1, 0, NULL, '2025-09-18 08:18:54', '2025-09-25 07:35:38', '2025-09-25 07:35:38', 1, 1, 2, 2, 2, 'USER-00002'),
 (3, 'User', 'User', 'User', 'male', '1986-10-01', 'user@app.com', NULL, '01090411576', 'company address', 'company address', 'default.png', '$2y$10$sy8HyPyJK1TAROJ7D3vYC.5870pLHUmHX6R5bXQtDQ3V6h7oyTRC6', '[\"staff\"]', 1, 1, 0, NULL, '2025-09-18 08:18:54', '2025-09-19 03:21:02', '2025-09-19 03:21:02', 1, 1, 3, 2, 3, 'USER-00003');
 
 -- --------------------------------------------------------
