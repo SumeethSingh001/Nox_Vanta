@@ -709,7 +709,7 @@ CREATE TABLE `purchase_invoice_details` (
   `unit_price` decimal(8,2) NOT NULL ,
   `first_tax_id` bigint(20) UNSIGNED DEFAULT NULL,
   `second_tax_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `row_total` mediumtext NOT NULL DEFAULT '0',
+  `row_total` mediumtext NOT NULL ,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -922,7 +922,7 @@ CREATE TABLE `sales_invoice_details` (
   `unit_price` decimal(8,2) NOT NULL ,
   `first_tax_id` bigint(20) UNSIGNED DEFAULT NULL,
   `second_tax_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `row_total` mediumtext NOT NULL DEFAULT '0',
+  `row_total` mediumtext NOT NULL ,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1008,7 +1008,7 @@ INSERT INTO `sections` (`id`, `name`, `status`, `created_at`, `updated_at`) VALU
 CREATE TABLE `sequential_codes` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `prefix` varchar(255) NOT NULL,
-  `numbers_length` bigint(20) NOT NULL DEFAULT 3,
+  `numbers_length` bigint(20) NOT NULL,
   `model` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
