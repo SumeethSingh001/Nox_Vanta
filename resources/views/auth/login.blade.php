@@ -1,112 +1,151 @@
-@extends('layouts.admin.auth_layout')
+@extends('layouts.app')
 
-@section('title', 'Login')
-
-@section('vendor-css')
-@endsection
-@section('page-css')
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets')}}/css/pages/authentication.css">
-@endsection
+@section('title', 'Login with GPS + Camera')
 
 @section('content')
-    <!-- login page start -->
-    <section id="auth-login" class="row flexbox-container">
-        <div class="col-xl-8 col-11">
-            <div class="card bg-authentication mb-0">
-                <div class="row m-0">
-                    <!-- left section-login -->
-                    <div class="col-md-6 col-12 px-0">
-                        <div class="card disable-rounded-right mb-0 p-2 h-100 d-flex justify-content-center">
-                            <div class="card-header pb-1">
-                                <div class="card-title">
-                                    <h4 class="text-center mb-2">{{__('Welcome Back')}}</h4>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex flex-md-row flex-column justify-content-around">
-                                    <a href="javascript:void(0);" class="btn btn-social btn-google btn-block font-small-3 mr-md-1 mb-md-0 mb-1">
-                                        <i class="bx bxl-google font-medium-3"></i>
-                                        <span class="pl-50 d-block text-center">Google</span>
-                                    </a>
-                                    <a href="javascript:void(0);" class="btn btn-social btn-block mt-0 btn-facebook font-small-3">
-                                        <i class="bx bxl-facebook-square font-medium-3"></i>
-                                        <span class="pl-50 d-block text-center">Facebook</span>
-                                    </a>
-                                </div>
-                                <div class="divider">
-                                    <div class="divider-text text-uppercase text-muted">
-                                        <small>Or login with email</small>
-                                    </div>
-                                </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4>Secure Login (Camera + GPS)</h4>
+                </div>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                                <form method="POST" action="{{ route('login') }}">
-                                    @csrf
+                    <form method="POST" action="{{ route('login') }}" enctype="multipart/form-data">
+                        @csrf
 
-                                    <div class="form-group mb-50">
-                                        <label class="text-bold-600" for="email">{{ __('Email Or Phone Number') }}</label>
-                                        <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email"  placeholder="{{ __('Enter your email or your phone number') }}" value="{{ old('email') }}" required autocomplete="email" autofocus>
-                                        @error('email')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="text" name="email" class="form-control" value="{{ old('email') }}" required>
+                        </div>
 
-                                    <div class="form-group">
-                                        <label class="text-bold-600" for="password">{{ __('Password') }}</label>
-                                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password"  placeholder="{{ __('Password') }}" required autocomplete="current-password">
-                                        @error('password')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
 
-                                    <div class="form-group d-flex flex-md-row flex-column justify-content-between align-items-center">
-                                        <div class="text-left">
-                                            <div class="checkbox checkbox-sm">
-                                                <input type="checkbox" class="form-check-input" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                                <label class="checkboxsmall" for="remember">
-                                                    <small>{{ __('Remember Me') }}</small>
-                                                </label>
-                                            </div>
-                                        </div>
+                        <input type="hidden" name="latitude" id="latitude">
+                        <input type="hidden" name="longitude" id="longitude">
+                        <input type="hidden" name="accuracy" id="accuracy">
+                        <input type="hidden" name="login_photo" id="login_photo">
 
-                                        <div class="text-right">
-                                            @if (Route::has('password.request'))
-                                                <a class="card-link" href="{{ route('password.request') }}">
-                                                    <small>{{ __('Forgot Your Password?') }}</small>
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary glow w-100 position-relative">
-                                        {{ __('Login') }}<i id="icon-arrow" class="bx bx-right-arrow-alt"></i>
-                                    </button>
-                                </form>
-                                <hr>
-{{--                                <div class="text-center">--}}
-{{--                                    <small class="mr-25">{{__("Don't have an account?")}}</small>--}}
-{{--                                    <a href="{{route('register')}}">--}}
-{{--                                        <small>{{__('Register')}}</small>--}}
-{{--                                    </a>--}}
-{{--                                </div>--}}
+                        <div class="mb-3 text-center">
+                            <video id="video" autoplay playsinline style="width:100%; max-height:300px; display:none; border:1px solid #ddd;"></video>
+                            <canvas id="canvas" style="display:none;"></canvas>
+                            <img id="photoPreview" class="mt-2" style="max-width:100%; display:none; border-radius:8px;" alt="preview"/>
+                            <div class="mt-3">
+                                <button type="button" id="startCamera" class="btn btn-outline-secondary btn-sm">Open Camera</button>
+                                <button type="button" id="capturePhoto" class="btn btn-primary btn-sm" style="display:none;">Capture</button>
+                                <button type="button" id="retakePhoto" class="btn btn-warning btn-sm" style="display:none;">Retake</button>
                             </div>
                         </div>
-                    </div>
-                    <!-- right section image -->
-                    <div class="col-md-6 d-md-block d-none text-center align-self-center p-3">
-                        <img class="img-fluid" src="{{asset('app-assets')}}/images/pages/login.png" alt="branding logo">
-                    </div>
+
+                        <button type="submit" class="btn btn-success w-100">Login</button>
+                    </form>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- login page ends -->
-@endsection
+    </div>
+</div>
 
-@section('page-vendor-js')
-@endsection
-@section('page-js')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const lat = document.getElementById('latitude');
+    const lon = document.getElementById('longitude');
+    const acc = document.getElementById('accuracy');
+
+    // Get GPS
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    lat.value = pos.coords.latitude;
+                    lon.value = pos.coords.longitude;
+                    acc.value = pos.coords.accuracy;
+                },
+                err => { alert("Enable location to continue login."); },
+                { enableHighAccuracy:true, timeout:10000 }
+            );
+        } else {
+            alert("Geolocation not supported.");
+        }
+    }
+    getLocation();
+
+    // Camera
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photoInput = document.getElementById('login_photo');
+    const preview = document.getElementById('photoPreview');
+    const startBtn = document.getElementById('startCamera');
+    const captureBtn = document.getElementById('capturePhoto');
+    const retakeBtn = document.getElementById('retakePhoto');
+    let stream = null;
+
+    startBtn.onclick = async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio:false });
+            video.srcObject = stream;
+            video.style.display = '';
+            captureBtn.style.display = '';
+            startBtn.style.display = 'none';
+        } catch (e) {
+            alert("Camera access required for login.");
+        }
+    };
+
+    captureBtn.onclick = () => {
+        const ctx = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        photoInput.value = dataUrl;
+        preview.src = dataUrl;
+        preview.style.display = '';
+        captureBtn.style.display = 'none';
+        retakeBtn.style.display = '';
+        stopCamera();
+    };
+
+    retakeBtn.onclick = () => {
+        preview.style.display = 'none';
+        photoInput.value = '';
+        startBtn.style.display = '';
+        retakeBtn.style.display = 'none';
+    };
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+        }
+        video.style.display = 'none';
+    }
+
+    // Ensure camera & location present before submit
+    document.querySelector('form').addEventListener('submit', e => {
+        if (!photoInput.value) {
+            e.preventDefault();
+            alert("Please capture your photo to continue.");
+            return false;
+        }
+        if (!lat.value || !lon.value) {
+            e.preventDefault();
+            alert("Please allow location access to continue.");
+            return false;
+        }
+    });
+});
+</script>
 @endsection

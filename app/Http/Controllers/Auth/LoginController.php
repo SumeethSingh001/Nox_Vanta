@@ -2,91 +2,82 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Hash;
-use App\Providers\RouteServiceProvider;
+use App\Models\LoginLog;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Providers\RouteServiceProvider;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    // protected $redirectTo = RouteServiceProvider::HOME;
+    //protected $redirectTo = '/home'; // change if needed
     protected $redirectTo = RouteServiceProvider::DASHBOARD;
-    protected $maxAttempts = 3; //Default 5
-    protected $decayMinutes = 5; //Default 1
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
     }
 
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
     /**
-     * Get the login username to be used by the controller.
-     * Check if the login by email or phone to return username
-     * @return string
+     * Override login() to make camera mandatory and store location/photo.
      */
-    public function username()
+    public function login(Request $request)
     {
-        $value = request()->input('email');
-        $field = filter_var($value, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone' ;
-        request()->merge([$field => $value]);
-        return $field;
-    }
+        $request->validate([
+            'email'      => 'required|string',
+            'password'   => 'required|string',
+            'latitude'   => 'required',
+            'longitude'  => 'required',
+            'login_photo'=> 'required', // mandatory camera
+        ], [
+            'login_photo.required' => 'Camera photo is required to login.',
+        ]);
 
-    protected function credentials(Request $request)
-    {
-        if($request->has('phone')){
-            $email = User::where('phone', $request->phone)->pluck('email');
-            return ['phone' => $request->phone,'email' => $email, 'password' => $request->password ,'status' => 1];
-        }else{
-            return ['email' => $request->email, 'password' => $request->password, 'status' => 1];
-        }
-    }
-
-    protected function sendFailedLoginResponse(Request $request)
-    {
-        $errors = [$this->username() => trans('auth.failed')];
-
-        // Load user from database
-        $user = User::where($this->username(), $request->{$this->username()})->first();
-
-        // Check if user was successfully loaded, that the password matches
-        // and active is not 1. If so, override the default error message.
-        if ($user && Hash::check($request->password, $user->password) && $user->status != 1) {
-            $errors = [$this->username() => trans('auth.not_active')];
+        // Save photo to storage
+        $photoPath = null;
+        $b64 = $request->input('login_photo');
+        if ($b64 && preg_match('/^data:image\/(\w+);base64,/', $b64, $type)) {
+            $data = substr($b64, strpos($b64, ',') + 1);
+            $data = base64_decode($data);
+            if ($data !== false) {
+                $ext = $type[1] === 'jpeg' ? 'jpg' : $type[1];
+                $fileName = 'login_photos/' . Str::random(40) . '.' . $ext;
+                Storage::disk('public')->put($fileName, $data);
+                $photoPath = $fileName;
+            }
         }
 
-        if ($request->expectsJson()) {
-            return response()->json($errors, 422);
+        // Attempt login
+        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            $user = Auth::user();
+
+            // Store GPS + photo
+            LoginLog::create([
+                'user_id'   => $user->id,
+                'email'     => $user->email,
+                'ip'        => $request->ip(),
+                'latitude'  => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
+                'accuracy'  => $request->input('accuracy'),
+                'photo_path'=> $photoPath,
+                'user_agent'=> $request->header('User-Agent'),
+            ]);
+
+            return redirect()->intended($this->redirectTo);
         }
 
-        return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors($errors);
+        return back()->withErrors([
+            'email' => 'Invalid credentials or photo missing.',
+        ])->withInput($request->only('email'));
     }
-
 }
