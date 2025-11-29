@@ -34,7 +34,7 @@
                                 </g>
                             </svg>
                         </div>
-                        <h2 class="brand-text mb-0">Nox Vanta</h2>
+                        <h2 class="brand-text mb-0">ANM Quadrant</h2>
                     </a></li>
                 <!-- <li class="nav-item nav-toggle">
                     <a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse">
@@ -128,6 +128,12 @@
                                 <a class="d-flex align-items-center" href="{{route('users.index')}}">
                                     <i class="bx bx-right-arrow-alt"></i>
                                     <span class="menu-item text-truncate" data-i18n="List">{{trans('applang.users')}}</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is(app()->getLocale().'/admin/attendance*') ? ' active' : '' }}">
+                                <a class="d-flex align-items-center" href="{{route('attendance.index')}}">
+                                    <i class="bx bx-right-arrow-alt"></i>
+                                    <span class="menu-item text-truncate" data-i18n="List">{{trans('applang.attendance')}}</span>
                                 </a>
                             </li>
                         </ul>

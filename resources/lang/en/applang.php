@@ -20,6 +20,7 @@ return [
     "organizational_chart"              => "Organizational Chart",
     "employees"                         => "Employees",
     "users"                             => "Users",
+    "attendance"                             => "Attendance",
     "user"                              => "User",
     "roles"                             => "Roles",
     "permissions"                       => "Permissions",

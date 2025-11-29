@@ -34,6 +34,7 @@ Route::group(
 
             //Roles & Permissions
             Route::resource('/users', App\Http\Controllers\Admin\UserController::class);
+            Route::resource('/attendance', App\Http\Controllers\Admin\AttendanceController::class);
             Route::delete('/delete-selected-users', [App\Http\Controllers\Admin\UserController::class, 'deleteSelectedUsers'])->name('deleteSelectedUsers');
             Route::get('/users/role/{id}', [App\Http\Controllers\Admin\UserController::class, 'usersOfRoleQuery'])->name('usersOfRoleQuery');
 
